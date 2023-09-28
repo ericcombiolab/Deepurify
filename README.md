@@ -1,4 +1,4 @@
-# Deepurify_Project
+# Deepurify
 
   **Paper --> Deepurify: a multi-modal deep language model to remove contamination from metagenome-assembled genomes**
   
