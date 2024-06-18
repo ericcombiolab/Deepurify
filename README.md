@@ -281,4 +281,12 @@ This system can run the deepurify commands in the **"Running Deepurify"** sectio
 This system configuration runs the 'clean' mode for the data in the demo_inputs folder for around 10 minutes.
 
 ## Repo Contents
+- [Deepurify-DB](./Deepurify-DB): The model weights and other necessary files for running Deepurify.
+- [Deepurify](./Deepurify): The main codes (Python) of Deepurify.
+- [demo_inputs](./demo_inputs): The demo MAGs.
+
+
+
+
+
 
