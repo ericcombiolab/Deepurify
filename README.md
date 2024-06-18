@@ -1,5 +1,5 @@
 # Deepurify
-**Paper --> Deepurify: a multi-modal deep language model to remove contamination from metagenome-assembled genomes**
+**Paper --> A multi-modal deep language model to remove contamination from metagenome-assembled genomes**
 
 Deepurify elevates metagenome-assembled genomes' (MAGs) quality by utilizing a multi-modal deep language model to filter contaminated contigs, and it can leverage GPU acceleration.
 
@@ -279,3 +279,6 @@ This system can run the deepurify commands in the **"Running Deepurify"** sectio
 - GPU: 8 GPUs (A100-40GB)
 
 This system configuration runs the 'clean' mode for the data in the demo_inputs folder for around 10 minutes.
+
+## Repo Contents
+
