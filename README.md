@@ -1,5 +1,5 @@
 # Deepurify
-**Paper --> Deepurify: a multi-modal deep language model to remove contamination from metagenome-assembled genomes**
+**Paper --> A multi-modal deep language model to remove contamination from metagenome-assembled genomes**
 
 Deepurify elevates metagenome-assembled genomes' (MAGs) quality by utilizing a multi-modal deep language model to filter contaminated contigs, and it can leverage GPU acceleration.
 
@@ -41,6 +41,7 @@ After preparing the environment, the code of Deepurify can be installed via pip 
 conda activate deepurify
 pip install Deepurify==2.3.5
 ```
+This installation will run for around 10 minutes.
 
 ## Download Model Weight and Other Files for Running
 Download the model weight and other files (**Deepurify-DB.zip**) for running Deepurify from this **[LINK](https://drive.google.com/file/d/1FXpxoXFYHcX9QAFe7U6zfM8YjalxNLFk/view?usp=sharing)**.
@@ -277,17 +278,15 @@ This system can run the deepurify commands in the **"Running Deepurify"** sectio
 - RAM: 1TB
 - GPU: 8 GPUs (A100-40GB)
 
-This system can run the configuration in the main.py file.
-```
-cleanMAGs(
-    output_bin_folder_path=cur_output_folder,
-    batch_size_per_gpu=48,
-    each_gpu_threads=4,
-    # the setting of contig inference stage
-    contig_fasta_path=cur_input_contigs,
-    sorted_bam_file=cur_bam,
-    gpu_work_ratio=[0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
-    num_process=256,
-    db_files_path="./Deepurify-DB/"
-)
-```
+This system configuration runs the 'clean' mode for the data in the demo_inputs folder for around 10 minutes.
+
+## Repo Contents
+- [Deepurify-DB](./Deepurify-DB): The model weights and other necessary files for running Deepurify.
+- [Deepurify](./Deepurify): The main codes (Python) of Deepurify.
+- [demo_inputs](./demo_inputs): The demo MAGs.
+
+
+
+
+
+
