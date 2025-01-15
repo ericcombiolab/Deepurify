@@ -5,7 +5,8 @@ from typing import Dict, List, Union
 
 from Deepurify.decontamination import binning_purify
 from Deepurify.Utils.BuildFilesUtils import (collect_all_deconta_results,
-                                             process_drep_result, filterSpaceInFastaFile)
+                                             filterSpaceInFastaFile,
+                                             process_drep_result)
 from Deepurify.Utils.RunCMDUtils import runDeRep
 
 
@@ -22,6 +23,7 @@ def run_integration(
     phy2accsPath: str,
     mer3Path: str,
     mer4Path: str,
+    checkm2_db_file_path: str,
     gpus_work_ratio: List[float],
     batch_size_per_gpu: List[float],
     each_gpu_threads: int,
@@ -63,6 +65,7 @@ def run_integration(
         phy2accsPath,
         mer3Path,
         mer4Path,
+        checkm2_db_file_path,
         gpus_work_ratio,
         batch_size_per_gpu,
         each_gpu_threads,

@@ -27,7 +27,6 @@ Create deepurify's conda environment by using this command:
 ```
 conda env create -n deepurify -f deepurify-conda-env.yml
 ```
-Do not forget to download the database files for **CheckM2 !!!** and set environmental variable CHECKM2DB using: ```export CHECKM2DB="/path/to/database/uniref100.KO.1.dmnd"```. 
 
 and Please download PyTorch v2.1.0 -cu121 (or higher version) from **[http://pytorch.org/](http://pytorch.org/)** if you want to use GPUs (We highly recommend to use GPUs).
 ```
@@ -39,12 +38,13 @@ conda install pytorch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 pytorch-cuda=
 After preparing the environment, the code of Deepurify can be installed via pip simply. 
 ```
 conda activate deepurify
-pip install Deepurify==2.3.5
+pip install Deepurify==2.3.8
 ```
 This installation will run for around 10 minutes.
 
 ## Download Model Weight and Other Files for Running
-Download the model weight and other files (**Deepurify-DB.zip**) for running Deepurify from this **[LINK](https://drive.google.com/file/d/1FXpxoXFYHcX9QAFe7U6zfM8YjalxNLFk/view?usp=sharing)**.
+Download the model weight and other files (**Deepurify-DB.zip**) for running Deepurify from this **[LINK](https://drive.google.com/file/d/1CIijZl2sVsDhjKQb2AabLbzYYrFYGpfI/view?usp=sharing)**.
+
 
 #### 1. Set Environmental Variable
 - Unzip the downloaded file (**Deepurify-DB.zip**) and set an **environmental variable** called "DeepurifyInfoFiles" by adding the following line to the last line of .bashrc file (The path of the file: ~/.bashrc):
