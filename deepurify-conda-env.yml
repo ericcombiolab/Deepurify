@@ -85,9 +85,9 @@ dependencies:
   - tzdata=2024a=h0c530f3_0
   - urllib3=2.2.1=pyhd8ed1ab_0
   - wheel=0.42.0=pyhd8ed1ab_0
-  - xz=5.2.6=h166bdaf_0
-  - zlib=1.2.13=hd590300_5
-  - zstd=1.4.9=ha95c52a_0
+  - xz
+  - zlib
+  - zstd
   - hmmer=3.3.2=hdbdd923_4
   - prodigal=2.6.3=h031d066_8
   - semibin=2.1.0=pyhdfd78af_0
