@@ -22,6 +22,8 @@ Please independently install the following tools and ensure their proper functio
 
 
 ## Installation (Have Verified):
+#### 0. Please install Python 3.8.18
+
 #### 1. FIRST STEP (Create Conda Environment for Deepurify)
 Create deepurify's conda environment by using this command:
 ```
