@@ -253,4 +253,49 @@ def process_drep_result(
     wh.close()
 
 
+def readGalahClusterTSV(tsv_path: str):
+    res = {}
+    with open(tsv_path, "r", encoding="utf-8") as rh:
+        for line in rh:
+            info = line.strip("\n").split("\t")
+            if info[0] in res:
+                res[info[0]].append(info[1])
+            else:
+                res[info[0]] = [info[1]]
+    return res
 
+
+def process_galah_result(
+    drep_genomes_folder,
+    galah_tsv_path: str,
+    output_folder: str,
+):
+    collect = {}
+    checkm2_meta_info = readMetaInfo(os.path.join(drep_genomes_folder, "MetaInfo.tsv"))[0]
+    clu_res_info = readGalahClusterTSV(galah_tsv_path)
+    wh = open(os.path.join(output_folder, "MetaInfo.tsv"), "w")
+    # n: name, q: quality, v: path of file
+    for c, vals in clu_res_info.items():
+        for v in vals:
+            n = os.path.split(v)[-1]
+            q = checkm2_meta_info[n]
+            if c not in collect:
+                    collect[c] = [(n, q, v, getScore(q))]
+            else:
+                collect[c].append((n, q, v, getScore(q)))
+    res = []
+    for c, q_l in collect.items():
+        res.append(list(sorted(q_l, key=lambda x: x[-1], reverse=True))[0])
+    for i, r in enumerate(res):
+        outName = f"Deepurify_Bin_{i}.fasta"
+        wh.write(outName
+                + "\t"
+                + str(r[1][0])
+                + "\t"
+                + str(r[1][1])
+                + "\t"
+                + str(r[1][2])
+                + "\n")
+        copy(os.path.join(drep_genomes_folder, r[0]), 
+            os.path.join(output_folder, outName))
+    wh.close()

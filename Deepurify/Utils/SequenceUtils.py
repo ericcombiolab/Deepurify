@@ -264,7 +264,6 @@ def ConvertSeqToImageTensorMoreFeatures(max_model_len: int, seq: str, vocab_3Mer
     This function requires the seq does not have padding char 'X'. The seq is the original seq.
     """
     # assert "X" not in seq, ValueError("'X' in the seq. ")
-    seq = seq.upper()
     seqLength = len(seq)
     assert seqLength <= max_model_len, "Your seq length is bigger than max_model_len."
     oriSeq = seq + "".join(["X" for _ in range(max_model_len - seqLength)])

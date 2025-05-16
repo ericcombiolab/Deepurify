@@ -7,7 +7,7 @@ import torch.distributed as dist
 import torch.nn as nn
 import torch.optim as optim
 from Model.Loss import FocalCrossEntropyLoss, cosineLoss
-from torch.cuda.amp import autocast_mode, grad_scaler
+from torch.amp import autocast_mode, grad_scaler
 from torch.distributed.optim import ZeroRedundancyOptimizer
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.data.distributed import DistributedSampler

@@ -4,6 +4,7 @@ import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
 from multiprocessing import Process, Queue
+import multiprocessing as mp
 from typing import Callable, Dict, List, Tuple, Union
 
 import numpy as np
@@ -952,6 +953,7 @@ def estimateContigSimInBinsPall(
     error_queue = None
     nextIndex = 0
     num_gpu = len(gpus_work_ratio)
+    print(f"--> The method for multiprocessing is {mp.get_start_method()}")
     if num_gpu == 0:
         binFilesList = os.listdir(inputBinFolder)
         totalNum = len(binFilesList)

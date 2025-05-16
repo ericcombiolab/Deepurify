@@ -137,16 +137,12 @@ def runCheckm2Single(
         input_bin_folder: str,
         output_bin_folder: str,
         bin_suffix: str,
-        db_file_path: str,
+        db_path: str,
         num_cpu: int):
     if os.path.exists(output_bin_folder) is False:
         os.makedirs(output_bin_folder)
-    res = subprocess.Popen(
-        f"checkm2 predict -x {bin_suffix} --threads {num_cpu} -i {input_bin_folder} -o {output_bin_folder} --database_path {db_file_path}",
-        shell=True,
-    )
-    res.wait()
-    res.kill()
+    cmd = f"checkm2 predict -x {bin_suffix} --threads {num_cpu} -i {input_bin_folder} -o {output_bin_folder} --database_path {db_path}"
+    os.system(cmd)
 
 
 def runCheckM2ForSixFilter(
@@ -314,22 +310,22 @@ def buildCheckm2TmpFilesParall(
         p.join()
 
 
-def target(modified_bins_folder, modified_checkm2_tmp_folder, bin_suffix, db_file_path):
+def target(modified_bins_folder, modified_checkm2_tmp_folder, bin_suffix, db_path):
     num_cpu = psutil.cpu_count()
     res = subprocess.Popen(
-        f"checkm2 predict -x {bin_suffix} --threads {num_cpu} --resume -i {modified_bins_folder} -o {modified_checkm2_tmp_folder} --database_path {db_file_path}",
+        f"checkm2 predict -x {bin_suffix} --threads {num_cpu} --resume -i {modified_bins_folder} -o {modified_checkm2_tmp_folder} --database_path {db_path}",
         shell=True,
     )
     res.wait()
     res.kill()
 
 
-def runCheckm2Reuse(filterFolder: str, bin_suffix: str, db_file_path):
+def runCheckm2Reuse(filterFolder: str, bin_suffix: str, db_path: str):
     for i in range(7):
         modified_bins_folder = os.path.join(filterFolder, index2Taxo[i])
         modified_checkm2_tmp_folder = os.path.join(filterFolder, index2Taxo[i] + "_checkm2_res")
         if os.path.exists(os.path.join(modified_checkm2_tmp_folder, "quality_report.tsv")) is False:
-            target(modified_bins_folder, modified_checkm2_tmp_folder, bin_suffix, db_file_path)
+            target(modified_bins_folder, modified_checkm2_tmp_folder, bin_suffix, db_path)
 
 
 def runDeRep(drep_out_folder,
@@ -341,6 +337,23 @@ def runDeRep(drep_out_folder,
     )
     res.wait()
     res.kill()
+
+def runGalah(galah_out_folder,
+             genomes_input_folder,
+            cpu_num,
+            bin_suffix):
+    if not os.path.exists(galah_out_folder):
+        os.mkdir(galah_out_folder)
+    cur_out_files_txt = os.path.join(galah_out_folder, "files_path.txt")
+    with open(cur_out_files_txt, "w") as wh:
+        for i, file_name in enumerate(os.listdir(genomes_input_folder)):
+            _, suffix = os.path.splitext(file_name)
+            if suffix[1:] != bin_suffix:
+                continue
+            wh.write(os.path.join(genomes_input_folder, file_name) + "\n")
+    cmd = f"galah cluster --ani 99 --precluster-ani 90 --genome-fasta-list {cur_out_files_txt}  " + \
+        f"  --output-cluster-definition {os.path.join(galah_out_folder, 'clusters.tsv')}  -t {cpu_num}"
+    os.system(cmd)
 
 
 def runSemibin(input_contigs_path,

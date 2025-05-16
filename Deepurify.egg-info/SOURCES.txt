@@ -6,6 +6,7 @@ Deepurify/clean_func.py
 Deepurify/cli.py
 Deepurify/decontamination.py
 Deepurify/integration.py
+Deepurify/version.py
 Deepurify.egg-info/PKG-INFO
 Deepurify.egg-info/SOURCES.txt
 Deepurify.egg-info/dependency_links.txt

@@ -5,7 +5,6 @@ from typing import Dict, List, Union
 from Deepurify.decontamination import run_all_deconta_steps
 from Deepurify.integration import run_integration
 
-
 def cleanMAGs(
     output_bin_folder_path: str,
     gpu_work_ratio: List[float] = [1],
@@ -147,7 +146,7 @@ def cleanMAGs(
     mer4Path = os.path.join(db_files_path, "Vocabs", "4Mer_vocabulary.txt")
     hmmModelPath = os.path.join(db_files_path, "HMM", "hmm_models.hmm")
     phy2accsPath = os.path.join(db_files_path, "HMM", "phy2accs_new.pkl")
-    checkm2_db_file_path = os.path.join(db_files_path, "HMM", "checkm2_db.dmnd")
+    checkm2_db_path = os.path.join(db_files_path, 'Checkm', "checkm2_db.dmnd")
     
     if contig_fasta_path is not None and  sorted_bam_file is not None:
         run_integration(
@@ -163,7 +162,7 @@ def cleanMAGs(
             phy2accsPath=phy2accsPath,
             mer3Path=mer3Path,
             mer4Path=mer4Path,
-            checkm2_db_file_path=checkm2_db_file_path,
+            checkm2_db_path=checkm2_db_path,
             gpus_work_ratio=gpu_work_ratio,
             batch_size_per_gpu=batch_size_per_gpu,
             each_gpu_threads=each_gpu_threads,
@@ -193,7 +192,7 @@ def cleanMAGs(
             bin_suffix=bin_suffix,
             mer3Path=mer3Path,
             mer4Path=mer4Path,
-            checkm2_db_file_path=checkm2_db_file_path,
+            checkm2_db_path=checkm2_db_path,
             gpus_work_ratio=gpu_work_ratio,
             batch_size_per_gpu=batch_size_per_gpu,
             each_gpu_threads=each_gpu_threads,

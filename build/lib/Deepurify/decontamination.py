@@ -1,12 +1,13 @@
 import os
 import sys
-import time
 from multiprocessing import Process
+import multiprocessing as mp
 from shutil import rmtree
 from typing import Dict, List, Union
 
 import psutil
 import torch
+import time
 
 from Deepurify.Utils.BuildFilesUtils import (build_taxonomic_file,
                                              buildAllConcatFiles,
@@ -36,7 +37,7 @@ def run_all_deconta_steps(
     bin_suffix: str,
     mer3Path: str,
     mer4Path: str,
-    checkm2_db_file_path: str,
+    checkm2_db_path: str,
     gpus_work_ratio: List[float],
     batch_size_per_gpu: List[float],
     each_gpu_threads: int,
@@ -56,6 +57,7 @@ def run_all_deconta_steps(
     just_annot=False,
     
 ):
+    mp.set_start_method("spawn", force=True)
     if os.path.exists(outputBinFolder) is False:
         os.mkdir(outputBinFolder)
     if os.path.exists(tempFileOutFolder) is False:
@@ -96,7 +98,6 @@ def run_all_deconta_steps(
                             oneline = "_".join(oneline.split())
                         wh.write(oneline + "\n")
         inputBinFolder = filtered_space_output_bin_folder
-    
     
     # TODO: BUG in this line.
     # after run build_taxonomic_file function, the following codes would be locked.
@@ -142,11 +143,12 @@ def run_all_deconta_steps(
     end_time = time.time()
     with open(os.path.join(tempFileOutFolder, "Annot.time"), "w") as wh:
         wh.write(str(end_time - start_time) + "\n")
-    print("\n")
 
     if just_annot:
         return 
     
+    mp.set_start_method("fork", force=True)
+    print(f"--> The method for multiprocessing is {mp.get_start_method()}")
     if build_concat_file:
         buildAllConcatFiles(
             inputBinFolder,
@@ -178,8 +180,6 @@ def run_all_deconta_steps(
         e_time = time.time()
         with open(os.path.join(tempFileOutFolder, "CallGene.time"), "w") as wh:
             wh.write(str(e_time - s_time) + "\n")
-        print("\n")
-        print("\n")
     
     print("========================================================================")
     print("--> Start to Filter Contaminations and Separate Bins...")
@@ -201,7 +201,7 @@ def run_all_deconta_steps(
     e_time = time.time()
     with open(os.path.join(tempFileOutFolder, "Filter.time"), "w") as wh:
         wh.write(str(e_time - s_time) + "\n")
-    print("\n")
+    
     if simulated_MAG:
         return
     
@@ -212,12 +212,12 @@ def run_all_deconta_steps(
     if os.path.exists(originalBinsCheckMfolder) is False:
         os.mkdir(originalBinsCheckMfolder)
     s_time = time.time()
+    ### checkm2_db_path
     if os.path.exists(originalBinsCheckMPath) is False:
-        runCheckm2Single(inputBinFolder, originalBinsCheckMfolder, bin_suffix, checkm2_db_file_path, cpu_num)
+        runCheckm2Single(inputBinFolder, originalBinsCheckMfolder, bin_suffix, db_path=checkm2_db_path, num_cpu=cpu_num)
     e_time = time.time()
     with open(os.path.join(tempFileOutFolder, "Checkm2_first.time"), "w") as wh:
         wh.write(str(e_time - s_time) + "\n")
-    print("\n")
     
     print("========================================================================")
     print("--> Start to Reuse the CheckM2's Tmp Files...")
@@ -226,16 +226,14 @@ def run_all_deconta_steps(
     e_time = time.time()
     with open(os.path.join(tempFileOutFolder, "Reuse.time"), "w") as wh:
         wh.write(str(e_time - s_time) + "\n")
-    print("\n")
     
     print("========================================================================")
     print("--> Start to Run CheckM2...")
     s_time = time.time()
-    runCheckm2Reuse(filterOutputFolder, bin_suffix, checkm2_db_file_path)
+    runCheckm2Reuse(filterOutputFolder, bin_suffix, checkm2_db_path)
     e_time = time.time()
     with open(os.path.join(tempFileOutFolder, "Checkm2_second.time"), "w") as wh:
         wh.write(str(e_time - s_time) + "\n")
-    print("\n")
     
     print("========================================================================")
     print("--> Start to Select Result...")
@@ -256,7 +254,6 @@ def run_all_deconta_steps(
             )
             for qualityValues, cor_path in outInfo:
                 collected_list.append((qualityValues, cor_path))
-    print("\n")
     e_time = time.time()
     with open(os.path.join(tempFileOutFolder, "Select_Res.time"), "w") as wh:
         wh.write(str(e_time - s_time) + "\n")
@@ -269,7 +266,6 @@ def run_all_deconta_steps(
         os.mkdir(outputBinFolder)
     write_result(outputBinFolder, collected_list, wh)
     wh.close()
-    print("\n")
     return N
 
 
@@ -450,7 +446,7 @@ def repeat_binning_purify(
     phy2accsPath,
     mer3Path,
     mer4Path,
-    checkm2_db_file_path,
+    checkm2_db_path,
     gpus_work_ratio,
     batch_size_per_gpu,
     each_gpu_threads,
@@ -482,7 +478,6 @@ def repeat_binning_purify(
     print(f"--> Start the 0-th re-binning...")
     if os.path.exists(os.path.join(re_cluster_folder, "Deepurify_Bin_0.fasta")) is False:
         binning(fasta_path, sorted_bam_file, re_cluster_folder, depth_path, num_process, binning_mode)
-    print("\n")
     
     index = 0
     for bin_name in os.listdir(re_cluster_folder):
@@ -508,7 +503,7 @@ def repeat_binning_purify(
             "fasta",
             mer3Path,
             mer4Path,
-            checkm2_db_file_path,
+            checkm2_db_path,
             gpus_work_ratio,
             batch_size_per_gpu,
             each_gpu_threads,
@@ -552,7 +547,6 @@ def repeat_binning_purify(
 
         if os.path.exists(os.path.join(re_cluster_folder, "Deepurify_Bin_0.fasta")) is False:
             binning(sub_fasta_path, sorted_bam_file, re_cluster_folder, depth_path, num_process, binning_mode)
-        print("\n")
 
         index = 0
         for bin_name in os.listdir(re_cluster_folder):
@@ -579,7 +573,7 @@ def repeat_binning_purify(
                 "fasta",
                 mer3Path,
                 mer4Path,
-                checkm2_db_file_path,
+                checkm2_db_path,
                 gpus_work_ratio,
                 batch_size_per_gpu,
                 each_gpu_threads,
@@ -611,7 +605,7 @@ def binning_purify(
     phy2accsPath: str,
     mer3Path: str,
     mer4Path: str,
-    checkm2_db_file_path: str,
+    checkm2_db_path: str,
     gpus_work_ratio: List[float],
     batch_size_per_gpu: List[float],
     each_gpu_threads: int,
@@ -645,7 +639,6 @@ def binning_purify(
     print("--> Start the initial binning...")
     if os.path.exists(os.path.join(re_cluster_folder, "Deepurify_Bin_0.fasta")) is False:
         binning(contig_fasta_path, sorted_bam_file, re_cluster_folder, depth_path, num_process, binning_mode)
-    print("\n")
 
     index = 0
     for bin_name in os.listdir(re_cluster_folder):
@@ -671,7 +664,7 @@ def binning_purify(
             "fasta",
             mer3Path,
             mer4Path,
-            checkm2_db_file_path,
+            checkm2_db_path,
             gpus_work_ratio,
             batch_size_per_gpu,
             each_gpu_threads,
@@ -699,30 +692,31 @@ def binning_purify(
         "fasta",
         None)
     
-    repeat_binning_purify(sub_fasta_path,
-                    sorted_bam_file,
-                    cur_temp_folder,
-                    depth_path,
-                    modelWeightPath,
-                    taxoVocabPath,
-                    taxoTreePath,
-                    taxoName2RepNormVecPath,
-                    hmmModelPath,
-                    phy2accsPath,
-                    mer3Path,
-                    mer4Path,
-                    checkm2_db_file_path,
-                    gpus_work_ratio,
-                    batch_size_per_gpu,
-                    each_gpu_threads,
-                    overlapping_ratio,
-                    cut_seq_length,
-                    seq_length_threshold,
-                    topkORgreedy,
-                    topK,
-                    model_config,
-                    num_process,
-                    concat_annot_path,
-                    concat_vec_path,
-                    0,
-                    binning_mode)
+    repeat_binning_purify(
+        sub_fasta_path,
+        sorted_bam_file,
+        cur_temp_folder,
+        depth_path,
+        modelWeightPath,
+        taxoVocabPath,
+        taxoTreePath,
+        taxoName2RepNormVecPath,
+        hmmModelPath,
+        phy2accsPath,
+        mer3Path,
+        mer4Path,
+        checkm2_db_path,
+        gpus_work_ratio,
+        batch_size_per_gpu,
+        each_gpu_threads,
+        overlapping_ratio,
+        cut_seq_length,
+        seq_length_threshold,
+        topkORgreedy,
+        topK,
+        model_config,
+        num_process,
+        concat_annot_path,
+        concat_vec_path,
+        0,
+        binning_mode)

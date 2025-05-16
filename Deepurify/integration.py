@@ -1,13 +1,12 @@
 
 import os
-from shutil import rmtree
 from typing import Dict, List, Union
 
 from Deepurify.decontamination import binning_purify
 from Deepurify.Utils.BuildFilesUtils import (collect_all_deconta_results,
-                                             filterSpaceInFastaFile,
-                                             process_drep_result)
-from Deepurify.Utils.RunCMDUtils import runDeRep
+                                            filterSpaceInFastaFile, 
+                                            process_galah_result)
+from Deepurify.Utils.RunCMDUtils import runGalah
 
 
 def run_integration(
@@ -23,7 +22,7 @@ def run_integration(
     phy2accsPath: str,
     mer3Path: str,
     mer4Path: str,
-    checkm2_db_file_path: str,
+    checkm2_db_path: str,
     gpus_work_ratio: List[float],
     batch_size_per_gpu: List[float],
     each_gpu_threads: int,
@@ -65,7 +64,7 @@ def run_integration(
         phy2accsPath,
         mer3Path,
         mer4Path,
-        checkm2_db_file_path,
+        checkm2_db_path,
         gpus_work_ratio,
         batch_size_per_gpu,
         each_gpu_threads,
@@ -80,7 +79,7 @@ def run_integration(
     )
 
     print("============================================================")
-    print("--> Start dRep Filtering.")
+    print("--> Start Galah Filtering Replicated MAGs.")
     # Drep gather and filter results
     derep_g_folder = os.path.join(tempFileOutFolder, "derep_genomes")
     if os.path.exists(derep_g_folder) is False:
@@ -89,15 +88,22 @@ def run_integration(
     if os.path.exists(derep_out) is False:
         os.mkdir(derep_out)
     collect_all_deconta_results(de_temp_folder, derep_g_folder, "fasta")
-    runDeRep(derep_out, derep_g_folder, 64)
-    derep_csv = os.path.join(derep_out, "data_tables", "Cdb.csv")
-    # res_out_path = os.path.join(tempFileOutFolder, "RESULT")
+    galah_tsv = os.path.join(derep_out, "clusters.tsv")
+    if os.path.exists(galah_tsv) is False:
+        runGalah(derep_out, derep_g_folder, 64, "fasta")
     if os.path.exists(outputBinFolder) is False:
         os.makedirs(outputBinFolder)
-    process_drep_result(
-        derep_g_folder,
-        derep_csv,
-        outputBinFolder # outputBinFolder
-    )
+    process_galah_result(derep_g_folder, galah_tsv, outputBinFolder)
+    
+    # runDeRep(derep_out, derep_g_folder, 64)
+    # derep_csv = os.path.join(derep_out, "data_tables", "Cdb.csv")
+    # # res_out_path = os.path.join(tempFileOutFolder, "RESULT")
+    # if os.path.exists(outputBinFolder) is False:
+    #     os.makedirs(outputBinFolder)
+    # process_drep_result(
+    #     derep_g_folder,
+    #     derep_csv,
+    #     outputBinFolder # outputBinFolder
+    # )
     
     
